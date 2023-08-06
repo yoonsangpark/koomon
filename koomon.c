@@ -10,6 +10,8 @@
 #include <linux/module.h>
 #include <linux/miscdevice.h>
 #include <linux/fs.h>
+#include <linux/wait.h>
+#include <linux/uaccess.h>
 
 #include <linux/gpio.h>
 #include <plat/nvt-gpio.h>
@@ -26,12 +28,18 @@
 //#define P_GPIO(pin)  (pin + 0x20)
 static unsigned int irq_num;
 
+static DECLARE_WAIT_QUEUE_HEAD(wqueue);
+static int flag = 0;
+
 #define DRIVER_NAME "koomon"
 #define DRIVER_VERSION "0.1"
 
 static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
-        pr_info(">> koomon_irq_handler\n");
+        //pr_info(">> koomon_irq_handler\n");
+
+	flag = 1;
+	wake_up_interruptible(&wqueue);
 
         return IRQ_HANDLED;
 }
@@ -51,7 +59,13 @@ static int koomon_close(struct inode *inodep, struct file *filp)
 static ssize_t koomon_read(struct file *filp, char __user *buf,
                     size_t count, loff_t *f_pos)
 {
-	pr_info("koomon_read\n");
+	//pr_info(">> koomon_read\n");
+	
+	wait_event_interruptible(wqueue, flag != 0);
+	flag = 0;
+
+	copy_to_user(buf, "msg", count);
+
 	return 0;
 }
 
