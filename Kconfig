@@ -1,0 +1,4 @@
+config KOOMON
+	tristate "koomon driver"
+	help
+	  This is koomon driver
