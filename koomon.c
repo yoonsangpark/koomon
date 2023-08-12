@@ -12,6 +12,7 @@
 #include <linux/fs.h>
 #include <linux/wait.h>
 #include <linux/uaccess.h>
+#include <linux/atomic.h>
 
 #include <linux/gpio.h>
 #include <plat/nvt-gpio.h>
@@ -29,7 +30,7 @@
 static unsigned int irq_num;
 
 static DECLARE_WAIT_QUEUE_HEAD(wqueue);
-static int flag = 0;
+static atomic_t flag = ATOMIC_INIT(0);
 
 #define DRIVER_NAME "koomon"
 #define DRIVER_VERSION "0.1"
@@ -38,7 +39,7 @@ static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
         //pr_info(">> koomon_irq_handler\n");
 
-	flag = 1;
+	atomic_set(&flag, 1);
 	wake_up_interruptible(&wqueue);
 
         return IRQ_HANDLED;
@@ -61,8 +62,8 @@ static ssize_t koomon_read(struct file *filp, char __user *buf,
 {
 	//pr_info(">> koomon_read\n");
 	
-	wait_event_interruptible(wqueue, flag != 0);
-	flag = 0;
+	wait_event_interruptible(wqueue, atomic_read(&flag) != 0);
+	atomic_set(&flag, 0);
 
 	copy_to_user(buf, "msg", count);
 
