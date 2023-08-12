@@ -13,6 +13,7 @@
 #include <linux/wait.h>
 #include <linux/uaccess.h>
 #include <linux/atomic.h>
+#include <linux/ktime.h>
 
 #include <linux/gpio.h>
 #include <plat/nvt-gpio.h>
@@ -32,16 +33,27 @@ static unsigned int irq_num;
 static DECLARE_WAIT_QUEUE_HEAD(wqueue);
 static atomic_t flag = ATOMIC_INIT(0);
 
+static unsigned int recording_time = 5;
+static volatile ktime_t pre_time; 
+static volatile ktime_t cur_time;
+
 #define DRIVER_NAME "koomon"
 #define DRIVER_VERSION "0.1"
 
 static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
         //pr_info(">> koomon_irq_handler\n");
+	
+	cur_time = ktime_get();
+	if (ktime_to_ms(ktime_sub(cur_time, pre_time)) < (recording_time * 1000)) {
+		pr_info(">> ISR : elapsed time < %d Secs)\n", recording_time);
+		return IRQ_HANDLED;
+	}
 
 	atomic_set(&flag, 1);
 	wake_up_interruptible(&wqueue);
 
+	pre_time = cur_time;
         return IRQ_HANDLED;
 }
 
@@ -147,6 +159,8 @@ static int __init misc_init(void)
 
 	irq_num = gpio_to_irq(MGPIO);
 	pr_info("irq_num = %d\n", irq_num);
+
+	pre_time = ktime_get();
 
 	pr_info("misc_init : koomon\n");
 	return 0;
