@@ -26,8 +26,14 @@
 #define KOOMON_START	_IOR(KOO_IOCTL_MAGIC, 0x1, int32_t*)
 #define KOOMON_STOP	_IOR(KOO_IOCTL_MAGIC, 0x2, int32_t*)
 
-#define MGPIO P_GPIO(11)  /* 11 + 32 = 43 */
+/* NT98529 */
+//#define MGPIO P_GPIO(11)  /* 11 + 32 = 43 */
 //#define P_GPIO(pin)  (pin + 0x20)
+
+/* NT98566 */
+#define MGPIO S_GPIO(8)  /* 8 + 64 = 72 */
+#define S_GPIO(pin)	(pin + 0x40)
+
 static unsigned int irq_num;
 
 static DECLARE_WAIT_QUEUE_HEAD(wqueue);
