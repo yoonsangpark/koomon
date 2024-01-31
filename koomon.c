@@ -31,7 +31,7 @@
 //#define P_GPIO(pin)  (pin + 0x20)
 
 /* NT98566 */
-#define MGPIO S_GPIO(8)  /* 8 + 64 = 72 */
+#define MGPIO S_GPIO(1)  /* 1 + 64 = 65 */
 #define S_GPIO(pin)	(pin + 0x40)
 
 static unsigned int irq_num;
