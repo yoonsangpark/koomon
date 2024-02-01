@@ -31,8 +31,9 @@
 //#define P_GPIO(pin)  (pin + 0x20)
 
 /* NT98566 */
-#define MGPIO S_GPIO(1)  /* 1 + 64 = 65 */
-#define S_GPIO(pin)	(pin + 0x40)
+//#define S_GPIO(pin)	(pin + 0x40)
+#define MGPIO S_GPIO(1)  	/* 1 + 64 = 65 */
+#define CAM_BLK_PWR S_GPIO(3)	/* 3 + 64 = 67 */
 
 static unsigned int irq_num;
 
@@ -157,7 +158,8 @@ static int __init misc_init(void)
 		return ret;
 	}
 
-	ret = gpio_request(MGPIO, "gpio_test");
+	//EXT_INT1
+	ret = gpio_request(MGPIO, "ext_gpio1");
 	if (ret)
         	pr_err("#### failed to request MGPIO\n");
 
@@ -165,6 +167,13 @@ static int __init misc_init(void)
 
 	irq_num = gpio_to_irq(MGPIO);
 	pr_info("irq_num = %d\n", irq_num);
+
+	//CAM_BLK_PWR
+	ret = gpio_request(CAM_BLK_PWR, "cam_blk_pwr");
+	if (ret)
+        	pr_err("#### failed to request CAM_BLK_PWR\n");
+
+	gpio_direction_output(CAM_BLK_PWR, 1);
 
 	pre_time = ktime_get();
 
