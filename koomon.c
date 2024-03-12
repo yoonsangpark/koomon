@@ -32,7 +32,7 @@
 
 /* NT98566 */
 //#define S_GPIO(pin)	(pin + 0x40)
-#define MGPIO S_GPIO(1)  	/* 1 + 64 = 65 */
+#define MGPIO S_GPIO(2)  	/* 2 + 64 = 65 */
 #define CAM_BLK_PWR S_GPIO(3)	/* 3 + 64 = 67 */
 
 static unsigned int irq_num;
@@ -49,7 +49,7 @@ static volatile ktime_t cur_time;
 
 static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
-        //pr_info(">> koomon_irq_handler\n");
+        pr_info(">> koomon_irq_handler\n");
 	
 	cur_time = ktime_get();
 	if (ktime_to_ms(ktime_sub(cur_time, pre_time)) < (recording_time * 1000)) {
@@ -79,7 +79,7 @@ static int koomon_close(struct inode *inodep, struct file *filp)
 static ssize_t koomon_read(struct file *filp, char __user *buf,
                     size_t count, loff_t *f_pos)
 {
-	//pr_info(">> koomon_read\n");
+	pr_info(">> koomon_read\n");
 	
 	wait_event_interruptible(wqueue, atomic_read(&flag) != 0);
 	atomic_set(&flag, 0);
