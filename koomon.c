@@ -1,4 +1,4 @@
-/*
+/*/
  * Driver for the Koomonitor
  *
  * Copyright (C) 2023 KOO Inc.
@@ -14,6 +14,7 @@
 #include <linux/uaccess.h>
 #include <linux/atomic.h>
 #include <linux/ktime.h>
+#include <linux/delay.h>
 
 #include <linux/gpio.h>
 #include <plat/nvt-gpio.h>
@@ -25,6 +26,8 @@
 #define KOO_IOCTL_MAGIC 'K'
 #define KOOMON_START	_IOR(KOO_IOCTL_MAGIC, 0x1, int32_t*)
 #define KOOMON_STOP	_IOR(KOO_IOCTL_MAGIC, 0x2, int32_t*)
+#define KOOMON_PWR_ON	_IOR(KOO_IOCTL_MAGIC, 0x3, int32_t*)
+#define KOOMON_PWR_OFF	_IOR(KOO_IOCTL_MAGIC, 0x4, int32_t*)
 
 /* NT98529 */
 //#define MGPIO P_GPIO(11)  /* 11 + 32 = 43 */
@@ -113,6 +116,19 @@ static void koomon_stop(void)
 	free_irq(irq_num, NULL);
 }
 
+static void koomon_pwr_on(void)
+{
+	pr_info("koomon_pwr_on");
+	gpio_set_value(CAM_BLK_PWR, 1);
+	mdelay(500);
+}
+
+static void koomon_pwr_off(void)
+{
+	pr_info("koomon_pwr_off");
+	gpio_set_value(CAM_BLK_PWR, 0);
+}
+
 static long koomon_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {   
 	switch (cmd) {
@@ -124,6 +140,14 @@ static long koomon_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 		case KOOMON_STOP:
 			koomon_stop();
 			pr_info("KOOMON_STOP\n");
+			break;
+
+		case KOOMON_PWR_ON:
+			koomon_pwr_on();
+			break;
+
+		case KOOMON_PWR_OFF:
+			koomon_pwr_off();
 			break;
 
 		default:
@@ -173,7 +197,7 @@ static int __init misc_init(void)
 	if (ret)
         	pr_err("#### failed to request CAM_BLK_PWR\n");
 
-	gpio_direction_output(CAM_BLK_PWR, 1);
+	gpio_direction_output(CAM_BLK_PWR, 0);
 
 	pre_time = ktime_get();
 
