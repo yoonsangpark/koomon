@@ -82,7 +82,7 @@ static int koomon_close(struct inode *inodep, struct file *filp)
 static ssize_t koomon_read(struct file *filp, char __user *buf,
                     size_t count, loff_t *f_pos)
 {
-	pr_info(">> koomon_read\n");
+	//pr_info(">> koomon_read\n");
 	
 	wait_event_interruptible(wqueue, atomic_read(&flag) != 0);
 	atomic_set(&flag, 0);
@@ -95,7 +95,7 @@ static ssize_t koomon_read(struct file *filp, char __user *buf,
 static ssize_t koomon_write(struct file *file, const char __user *buf,
 		       size_t len, loff_t *ppos)
 {
-	pr_info("koomon_write\n");
+	//pr_info("koomon_write\n");
 	return 0;
 }
 
@@ -118,14 +118,14 @@ static void koomon_stop(void)
 
 static void koomon_pwr_on(void)
 {
-	pr_info("koomon_pwr_on");
+	pr_info("koomon_pwr_on\n");
 	gpio_set_value(CAM_BLK_PWR, 1);
 	mdelay(500);
 }
 
 static void koomon_pwr_off(void)
 {
-	pr_info("koomon_pwr_off");
+	pr_info("koomon_pwr_off\n");
 	gpio_set_value(CAM_BLK_PWR, 0);
 }
 
