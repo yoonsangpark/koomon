@@ -35,7 +35,7 @@
 
 /* NT98566 */
 //#define S_GPIO(pin)	(pin + 0x40)
-#define UART_SEL1	S_GPIO(1)  	/* 1 + 64 = 65 */
+#define UART_SEL1	S_GPIO(0)  	/* 0 + 64 = 64 */
 #define MGPIO		S_GPIO(2)  	/* 2 + 64 = 66 */
 #define CAM_BLK_PWR	S_GPIO(3)	/* 3 + 64 = 67 */
 
