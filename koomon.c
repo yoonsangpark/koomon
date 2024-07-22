@@ -35,8 +35,9 @@
 
 /* NT98566 */
 //#define S_GPIO(pin)	(pin + 0x40)
-#define MGPIO S_GPIO(2)  	/* 2 + 64 = 65 */
-#define CAM_BLK_PWR S_GPIO(3)	/* 3 + 64 = 67 */
+#define UART_SEL1	S_GPIO(1)  	/* 1 + 64 = 65 */
+#define MGPIO		S_GPIO(2)  	/* 2 + 64 = 66 */
+#define CAM_BLK_PWR	S_GPIO(3)	/* 3 + 64 = 67 */
 
 static unsigned int irq_num;
 
@@ -181,6 +182,18 @@ static int __init misc_init(void)
 		pr_err("can't misc_register :(\n");
 		return ret;
 	}
+
+#if 1
+	//UART_SEL1
+	ret = gpio_request(UART_SEL1, "uart_sel1");
+	if (ret)
+        	pr_err("#### failed to request UART_SEL1\n");
+
+	gpio_direction_output(UART_SEL1, 1);
+
+	gpio_set_value(UART_SEL1, 1);
+	pr_err("#### UART_SEL1 HIGH\n");
+#endif
 
 	//EXT_INT1
 	ret = gpio_request(MGPIO, "ext_gpio1");
