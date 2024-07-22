@@ -211,6 +211,7 @@ static int __init misc_init(void)
         	pr_err("#### failed to request CAM_BLK_PWR\n");
 
 	gpio_direction_output(CAM_BLK_PWR, 0);
+	gpio_set_value(CAM_BLK_PWR, 1);
 
 	pre_time = ktime_get();
 
