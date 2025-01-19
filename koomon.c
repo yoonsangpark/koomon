@@ -53,7 +53,7 @@ static volatile ktime_t cur_time;
 
 static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
-        pr_info(">> koomon_irq_handler\n");
+        pr_info(">> %s\n", __func__);
 	
 	cur_time = ktime_get();
 	if (ktime_to_ms(ktime_sub(cur_time, pre_time)) < (recording_time * 1000)) {
@@ -70,21 +70,21 @@ static irqreturn_t koomon_irq_handler(int irq, void *dev_id) {
 
 static int koomon_open(struct inode *inode, struct file *file)
 {
-	pr_info("koomon_open\n");
+        pr_info(">> %s\n", __func__);
 	return 0;
 }
 
 static int koomon_close(struct inode *inodep, struct file *filp)
 {
-	pr_info("koomon_close\n");
+        pr_info(">> %s\n", __func__);
 	return 0;
 }
 
 static ssize_t koomon_read(struct file *filp, char __user *buf,
                     size_t count, loff_t *f_pos)
 {
-	//pr_info(">> koomon_read\n");
-	
+        //pr_info(">> %s\n", __func__);
+
 	wait_event_interruptible(wqueue, atomic_read(&flag) != 0);
 	atomic_set(&flag, 0);
 
@@ -96,7 +96,7 @@ static ssize_t koomon_read(struct file *filp, char __user *buf,
 static ssize_t koomon_write(struct file *file, const char __user *buf,
 		       size_t len, loff_t *ppos)
 {
-	//pr_info("koomon_write\n");
+        //pr_info(">> %s\n", __func__);
 	return 0;
 }
 
@@ -119,14 +119,14 @@ static void koomon_stop(void)
 
 static void koomon_pwr_on(void)
 {
-	pr_info("koomon_pwr_on\n");
+        pr_info(">> %s\n", __func__);
 	//gpio_set_value(CAM_BLK_PWR, 1);
 	//mdelay(500);
 }
 
 static void koomon_pwr_off(void)
 {
-	pr_info("koomon_pwr_off\n");
+        pr_info(">> %s\n", __func__);
 	//gpio_set_value(CAM_BLK_PWR, 0);
 }
 
