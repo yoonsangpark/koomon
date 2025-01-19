@@ -44,7 +44,7 @@ static unsigned int irq_num;
 static DECLARE_WAIT_QUEUE_HEAD(wqueue);
 static atomic_t flag = ATOMIC_INIT(0);
 
-static unsigned int recording_time = 5;
+static unsigned int recording_time = 3;
 static volatile ktime_t pre_time; 
 static volatile ktime_t cur_time;
 
@@ -120,14 +120,14 @@ static void koomon_stop(void)
 static void koomon_pwr_on(void)
 {
 	pr_info("koomon_pwr_on\n");
-	gpio_set_value(CAM_BLK_PWR, 1);
-	mdelay(500);
+	//gpio_set_value(CAM_BLK_PWR, 1);
+	//mdelay(500);
 }
 
 static void koomon_pwr_off(void)
 {
 	pr_info("koomon_pwr_off\n");
-	gpio_set_value(CAM_BLK_PWR, 0);
+	//gpio_set_value(CAM_BLK_PWR, 0);
 }
 
 static long koomon_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
@@ -210,8 +210,8 @@ static int __init misc_init(void)
 	if (ret)
         	pr_err("#### failed to request CAM_BLK_PWR\n");
 
-	gpio_direction_output(CAM_BLK_PWR, 0);
-	gpio_set_value(CAM_BLK_PWR, 1);
+	//gpio_direction_output(CAM_BLK_PWR, 0);
+	//gpio_set_value(CAM_BLK_PWR, 1);
 
 	pre_time = ktime_get();
 
