@@ -24,10 +24,11 @@
 #include <linux/ioctl.h>
 
 #define KOO_IOCTL_MAGIC 'K'
-#define KOOMON_START	_IOR(KOO_IOCTL_MAGIC, 0x1, int32_t*)
-#define KOOMON_STOP	_IOR(KOO_IOCTL_MAGIC, 0x2, int32_t*)
-#define KOOMON_PWR_ON	_IOR(KOO_IOCTL_MAGIC, 0x3, int32_t*)
-#define KOOMON_PWR_OFF	_IOR(KOO_IOCTL_MAGIC, 0x4, int32_t*)
+#define KOOMON_START	_IOW(KOO_IOCTL_MAGIC, 0x1, int32_t*)
+#define KOOMON_STOP	_IOW(KOO_IOCTL_MAGIC, 0x2, int32_t*)
+#define KOOMON_PWR_ON	_IOW(KOO_IOCTL_MAGIC, 0x3, int32_t*)
+#define KOOMON_PWR_OFF	_IOW(KOO_IOCTL_MAGIC, 0x4, int32_t*)
+#define KOOMON_REC_TIME	_IOW(KOO_IOCTL_MAGIC, 0x5, int32_t*)
 
 /* NT98529 */
 //#define MGPIO P_GPIO(11)  /* 11 + 32 = 43 */
@@ -44,7 +45,7 @@ static unsigned int irq_num;
 static DECLARE_WAIT_QUEUE_HEAD(wqueue);
 static atomic_t flag = ATOMIC_INIT(0);
 
-static unsigned int recording_time = 3;
+unsigned int recording_time = 5;
 static volatile ktime_t pre_time; 
 static volatile ktime_t cur_time;
 
@@ -130,6 +131,16 @@ static void koomon_pwr_off(void)
 	//gpio_set_value(CAM_BLK_PWR, 0);
 }
 
+static void koomon_rec_time(unsigned long arg)
+{
+	pr_info(">> %s\n", __func__);
+	
+	copy_from_user((void *)&recording_time, (const void *)arg, sizeof(int32_t*));
+	pr_info(">> recording_time = %d\n", recording_time);
+
+	return;
+}
+
 static long koomon_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 {   
 	switch (cmd) {
@@ -149,6 +160,10 @@ static long koomon_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 
 		case KOOMON_PWR_OFF:
 			koomon_pwr_off();
+			break;
+
+		case KOOMON_REC_TIME:
+			koomon_rec_time(arg);
 			break;
 
 		default:
@@ -210,8 +225,8 @@ static int __init misc_init(void)
 	if (ret)
         	pr_err("#### failed to request CAM_BLK_PWR\n");
 
-	//gpio_direction_output(CAM_BLK_PWR, 0);
-	//gpio_set_value(CAM_BLK_PWR, 1);
+	gpio_direction_output(CAM_BLK_PWR, 0);
+	gpio_set_value(CAM_BLK_PWR, 1);
 
 	pre_time = ktime_get();
 
